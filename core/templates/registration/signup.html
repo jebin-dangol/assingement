@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Sign Up - URL Shortener{% endblock %}
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="card border-0 shadow-sm p-4">
+            <div class="text-center mb-4">
+                <h2 class="fw-bold">Create Account</h2>
+                <p class="text-muted small">Join us to start shortening your links</p>
+            </div>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+                {% for field in form %}
+                <div class="mb-3">
+                    <input type="{{ field.field.widget.input_type|default:'text' }}" name="{{ field.name }}"
+                        id="{{ field.id_for_label }}" class="form-control {% if field.errors %}is-invalid{% endif %}"
+                        placeholder="Enter your {{ field.label|lower }}">
+                    {% if field.errors %}
+                    <div class="invalid-feedback small">
+                        {% for error in field.errors %}{{ error }}{% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary py-2 fw-bold">Sign Up</button>
+                </div>
+            </form>
+            <div class="mt-4 text-center border-top pt-3">
+                <p class="small text-muted mb-0">Already have an account? <a href="{% url 'login' %}"
+                        class="text-decoration-none fw-bold">Login here</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .helptext,
+    .help-block,
+    form ul.errorlist+span.helptext,
+    .form-text {
+        display: none !important;
+    }
+
+    .form-control {
+        padding: 0.8rem 1rem;
+        border-color: #dee2e6;
+        border-radius: 8px;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+
+    .card {
+        border-radius: 16px;
+    }
+
+    body {
+        background-color: #f8f9fa;
+    }
+</style>
+{% endblock %}

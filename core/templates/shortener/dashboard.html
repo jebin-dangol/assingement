@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - URL Shortener{% endblock %}
+
+{% block content %}
+<h1 class="mb-4">My Dashboard</h1>
+
+{% if urls %}
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th class="px-4 py-3 border-0">Destination</th>
+                <th class="py-3 border-0">Short Code</th>
+                <th class="py-3 border-0">Analytics</th>
+                <th class="py-3 border-0">Status</th>
+                <th class="py-3 border-0">Created</th>
+                <th class="px-4 py-3 border-0 text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="border-top-0">
+            {% for url in urls %}
+            <tr>
+                <td class="px-4 py-3">
+                    <div class="d-flex flex-column" style="max-width: 320px;">
+                        <span class="text-dark fw-medium text-truncate" title="{{ url.original_url }}">{{
+                            url.original_url }}</span>
+                        <a href="{{ url.original_url }}" target="_blank" class="small text-muted text-decoration-none">
+                            <i class="lucide-external-link small me-1"></i> Visit site
+                        </a>
+                    </div>
+                </td>
+                <td class="py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-light text-dark border fw-semibold px-2 py-1">/{{ url.short_code }}</span>
+                        <a href="{% url 'redirect' url.short_code %}" target="_blank" class="text-primary"
+                            title="View short link">
+                            <i class="lucide-link-2"></i>
+                        </a>
+                    </div>
+                </td>
+                <td class="py-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="fw-bold text-dark">{{ url.clicks }}</span>
+                        <span class="text-muted small">clicks</span>
+                    </div>
+                </td>
+                <td class="py-3">
+                    {% if url.expires_at %}
+                    <span class="badge {% if url.is_expired %}bg-danger{% else %}bg-success{% endif %}">
+                        {% if url.is_expired %}Expired{% else %}Active{% endif %}
+                    </span>
+                    <div class="small text-muted" style="font-size: 0.7rem;">
+                        {% if url.is_expired %}
+                        Was: {{ url.expires_at|date:"M d, H:i" }}
+                        {% else %}
+                        Expires: {{ url.expires_at|date:"M d, H:i" }}
+                        {% endif %}
+                    </div>
+                    {% else %}
+                    <span class="badge bg-success">Active</span>
+                    <div class="small text-muted" style="font-size: 0.7rem;">Permanent</div>
+                    {% endif %}
+                </td>
+                <td class="py-3 text-muted small">
+                    {{ url.created_at|date:"M d, Y" }}
+                </td>
+                <td class="px-4 py-3 text-end">
+                    <div class="d-flex justify-content-end gap-2">
+                        <button class="btn btn-outline-primary btn-sm border-0"
+                            onclick="alert('QR Code: https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.scheme }}://{{ request.get_host }}/{{ url.short_code }}/')"
+                            title="View QR Code">
+                            <i class="lucide-qr-code"></i>
+                        </button>
+                        <a href="{% url 'edit_url' url.pk %}"
+                            class="btn btn-outline-secondary btn-sm border-0 bg-light-hover" title="Edit link">
+                            <i class="lucide-edit-2"></i>
+                        </a>
+                        <a href="{% url 'delete_url' url.pk %}"
+                            class="btn btn-outline-danger btn-sm border-0 bg-danger-subtle-hover text-danger"
+                            title="Delete link">
+                            <i class="lucide-trash-2"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="alert alert-info">
+    You haven't shortened any URLs yet. <a href="{% url 'home' %}">Create one now!</a>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete URL{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                Confirm Deletion
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to delete the short URL for:</p>
+                <p><strong>{{ object.original_url }}</strong></p>
+                <p class="text-danger">This action cannot be undone.</p>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

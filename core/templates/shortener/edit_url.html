@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit URL{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h2>Edit Smart URL</h2>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_original_url" class="form-label">Destination URL</label>
+                        <input type="url" name="original_url" value="{{ object.original_url }}" class="form-control"
+                            id="id_original_url" required>
+                        <div class="form-text">The short code <strong>{{ object.short_code }}</strong> will redirect to
+                            this new URL.</div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update URL</button>
+                    <a href="{% url 'dashboard' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

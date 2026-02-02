@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block title %}Shorten Your Links - ShortenIt{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-8 col-lg-7 text-center">
+        {% if user.is_authenticated %}
+        <h1 class="display-5 fw-bold mb-3">Simplify Your Links</h1>
+        <p class="text-muted mb-5">Create clean, memorable short links in seconds.</p>
+
+        <div class="card border-0 shadow-sm p-4 p-md-5">
+            <form method="post" class="text-start">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label class="form-label small fw-bold text-secondary">Destination URL</label>
+                    <input type="url" name="original_url" class="form-control form-control-lg"
+                        placeholder="https://example.com/very-long-link-to-shorten" required>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-7 mb-3 mb-md-0">
+                        <label class="form-label small fw-bold text-secondary">Custom Alias (Optional)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light">shorten.it /</span>
+                            <input type="text" name="short_code" class="form-control" placeholder="e.g. my-link"
+                                pattern="[a-zA-Z0-9-_]+" title="Only letters, numbers, hyphens and underscores allowed">
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label small fw-bold text-secondary">Expiration</label>
+                        <select name="expires_in" class="form-select">
+                            <option value="">Never Expires</option>
+                            <option value="1">1 Minute (Test)</option>
+                            <option value="60">1 Hour</option>
+                            <option value="1440">1 Day</option>
+                            <option value="10080">1 Week</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100 py-3 fw-bold shadow-sm" type="submit">
+                    Shorten URL
+                </button>
+            </form>
+
+            {% if error %}
+            <div class="alert alert-danger border-0 mt-4 text-start small">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            {% if short_url %}
+            <div class="mt-5 text-start pt-4 border-top">
+                <h5 class="fw-bold mb-3 font-monospace">Success! Your short link:</h5>
+                <div class="input-group shadow-sm">
+                    <input type="text" class="form-control bg-light fw-bold"
+                        value="{{ request.scheme }}://{{ request.get_host }}/{{ short_url.short_code }}/" readonly
+                        id="shortUrl">
+                    <button class="btn btn-dark px-4 fw-bold" type="button" onclick="copyToClipboard()"
+                        id="copyBtn">Copy</button>
+                </div>
+                <div class="mt-4 text-center">
+                    <p class="small text-muted mb-2">QR Code for your link:</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ request.scheme }}://{{ request.get_host }}/{{ short_url.short_code }}/"
+                        alt="QR Code" class="img-fluid border p-2 bg-white shadow-sm rounded">
+                </div>
+            </div>
+            <script>
+                function copyToClipboard() {
+                    const copyText = document.getElementById("shortUrl");
+                    const copyBtn = document.getElementById("copyBtn");
+                    copyText.select();
+                    copyText.setSelectionRange(0, 99999);
+                    navigator.clipboard.writeText(copyText.value);
+
+                    const originalText = copyBtn.innerText;
+                    copyBtn.innerText = "Copied!";
+                    copyBtn.classList.replace('btn-dark', 'btn-success');
+                    setTimeout(() => {
+                        copyBtn.innerText = originalText;
+                        copyBtn.classList.replace('btn-success', 'btn-dark');
+                    }, 2000);
+                }
+            </script>
+            {% endif %}
+        </div>
+        {% else %}
+        <div class="py-5">
+            <h1 class="display-4 fw-bold mb-4">Building bigger things?</h1>
+            <p class="fs-5 text-muted mb-5">ShortenIt is the simple, powerful way to shorten and manage your URLs.</p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'signup' %}" class="btn btn-primary btn-lg px-5 py-3 fw-bold rounded-pill">Get Started
+                    for Free</a>
+                <a href="{% url 'login' %}"
+                    class="btn btn-outline-secondary btn-lg px-5 py-3 fw-bold rounded-pill">Login</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .form-control {
+        padding: 0.8rem 1rem;
+        border-color: #dee2e6;
+        border-radius: 8px;
+    }
+
+    .form-control:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+
+    .card {
+        border-radius: 20px;
+    }
+</style>
+{% endblock %}
